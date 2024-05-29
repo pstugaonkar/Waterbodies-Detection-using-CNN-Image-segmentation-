@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Water Bodies Area Prediction</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0; /* Light gray background */
+      text-align: center;
+      margin-top: 50px;
+    }
+    h1 {
+      color: #007bff; /* Blue heading color */
+    }
+    #upload-section {
+      background-image: url('your_image_path.jpg'); /* Background image */
+      background-size: cover; /* Cover the entire section */
+      background-position: center; /* Center the background image */
+      padding: 50px; /* Padding for the section */
+      border-radius: 10px; /* Rounded corners */
+      margin: 0 auto; /* Center the section horizontally */
+      width: 50%; /* Set the width of the section */
+    }
+    input[type="file"] {
+      background-color: #ffffff; /* White background for file input */
+      color: #333333; /* Dark text color */
+      padding: 10px; /* Increased padding */
+      border: 2px solid #007bff; /* Blue border */
+      border-radius: 5px; /* Rounded corners */
+    }
+    input[type="submit"] {
+      background-color: #28a745; /* Green button background */
+      color: #ffffff; /* White text color */
+      padding: 12px 24px; /* Increased padding */
+      border: none; /* No border */
+      border-radius: 5px; /* Rounded corners */
+      cursor: pointer; /* Pointer cursor */
+      transition: background-color 0.3s ease; /* Smooth transition */
+    }
+    input[type="submit"]:hover {
+      background-color: #218838; /* Darker green on hover */
+    }
+    #progress-container {
+      display: none;
+      width: 100%;
+      background-color: #f3f3f3;
+      margin-top: 20px;
+      padding: 10px; /* Increased padding */
+      border-radius: 5px; /* Rounded corners */
+    }
+    #progress-bar {
+      width: 0%;
+      height: 30px;
+      background-color: #007bff; /* Blue progress bar */
+      border-radius: 5px; /* Rounded corners */
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #28a745; /* Green result text color */
+    }
+    #uploaded-image {
+      max-width: 100%; /* Ensure the image fits within its container */
+      margin-top: 20px;
+      align-items: center; /* Add space between the image and the result */
+    }
+  </style>
+</head>
+<body>
+  <div id="upload-section">
+    <h1>Upload an Image for Water Bodies Prediction</h1>
+    <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
+      <input type="file" name="file" accept="image/*" required>
+      <br><br>
+      <input type="submit" value="Upload and Predict">
+    </form>
+  </div>
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+  <div id="result"></div>
+  <img id="uploaded-image" src="#" alt="Uploaded Image" style="display: none;">
+  
+  <script>
+    document.getElementById('upload-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/predict', true);
+      
+      xhr.upload.onprogress = function(event) {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
+          document.getElementById('progress-container').style.display = 'block';
+          document.getElementById('progress-bar').style.width = percentComplete + '%';
+        }
+      };
+
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          document.getElementById('result').textContent = xhr.responseText;
+          // Show uploaded image
+          document.getElementById('uploaded-image').style.display = 'block';
+          document.getElementById('uploaded-image').src = URL.createObjectURL(formData.get('file'));
+        } else {
+          document.getElementById('result').textContent = 'An error occurred during the prediction.';
+        }
+        document.getElementById('progress-container').style.display = 'none';
+        document.getElementById('progress-bar').style.width = '0%';
+      };
+
+      xhr.send(formData);
+    });
+  </script>
+</body>
+</html>
